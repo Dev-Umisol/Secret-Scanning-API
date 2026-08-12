@@ -20,7 +20,7 @@ Secret exposure in public repos is one of the most common, costly, and preventab
 
 ## Scope (v1)
 
-- **Public GitHub repositories only.** Scanning private repos would require storing users' GitHub access tokens, live credentials with real access, which conflicts with a tool whose entire purpose is preventing credential exposure. Revisiting this is a possible future direction, but it would require encryption-at-rest and a materially larger security surface than this project's goals call for.
+- **Public GitHub repositories only.** Scanning private repos would require storing users' GitHub access tokens, live credentials with real access, which conflicts with a tool whose entire purpose is preventing credential exposure. Revisiting this in a possible future direction. 
 - **Default branch only.** Full commit-history / all-branch scanning (like Gitleaks) was considered but scoped out, it multiplies GitHub API calls without teaching anything new about the core skills this project demonstrates (pattern matching, entropy analysis, async HTTP, caching).
 
 ## Database Schema
@@ -39,7 +39,7 @@ Users <── Scans ──> Repos
 |---|---|
 | `id` | PK |
 | `email` | login identifier |
-| `hashed_password` | via `pwdlib` — never raw passwords |
+| `hashed_password` | via `pwdlib` - never raw passwords |
 | `created_at` | audit trail |
 
 ### `repos`
@@ -64,8 +64,8 @@ Represents one scan **attempt**, not the same as a repo. A repo can have many sc
 | `status` | `queued` → `in_progress` → `completed` / `failed` |
 | `error_message` | nullable; populated only on `failed` |
 | `created_at` | row creation — for debugging/audit, independent of `started_at` |
-| `started_at` | nullable — null while `queued` |
-| `finished_at` | nullable — set on `completed` or `failed` |
+| `started_at` | nullable - null while `queued` |
+| `finished_at` | nullable - set on `completed` or `failed` |
 
 Duration is deliberately **not** stored as its own column, it's derived (`finished_at - started_at`) rather than kept in sync manually.
 
@@ -78,7 +78,7 @@ One finding, belonging to one scan attempt (not directly to a repo, this is what
 | `scan_id` | FK → scans |
 | `file_path` | relative path in repo |
 | `line_number` | |
-| `masked_value` | e.g. `AKIA...3456` — **never the full secret** (see Security below) |
+| `masked_value` | e.g. `AKIA...3456` - **never the full secret** (see Security below) |
 | `secret_type` | plain text (e.g. `aws_access_key`) — not an ENUM, since new detectors get added over time and plain text avoids Postgres's `ALTER TYPE ADD VALUE` migration friction |
 | `severity` | Postgres **ENUM** (`critical`, `high`, `medium`, `low`) — fixed, small, stable set, so ENUM's declared-order sorting is worth the tradeoff here |
 | `created_at` | per-finding timestamp |
@@ -95,10 +95,10 @@ Each foreign key's `ON DELETE` behavior was chosen deliberately, not defaulted:
 
 ## Indexes
 
-- `scans.user_id` — every "my scan history" query filters on this.
-- `secrets.scan_id` — every "findings for this scan" query filters on this.
-- `repos.github_id` — already indexed automatically via its `UNIQUE` constraint.
-- No dedicated index on `severity` for sorting — results are filtered to a single scan first (small row count), so sorting the filtered set is cheap enough not to justify the write-time cost of an extra index.
+- `scans.user_id` - every "my scan history" query filters on this.
+- `secrets.scan_id` - every "findings for this scan" query filters on this.
+- `repos.github_id` - already indexed automatically via its `UNIQUE` constraint.
+- No dedicated index on `severity` for sorting, results are filtered to a single scan first (small row count), so sorting the filtered set is cheap enough not to justify the write-time cost of an extra index.
 
 ## API Routes
 

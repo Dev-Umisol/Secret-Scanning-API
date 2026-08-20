@@ -337,7 +337,7 @@ JWTs are stateless by design, the server holds no session record, so there's nor
 <!-- CONTACT -->
 ## Contact
 
-Destin Nguyen — [Portfolio](https://devdestinportfolio.vercel.app) — [GitHub](https://github.com/Dev-Umisol)
+Destin Nguyen | [Portfolio](https://devdestinportfolio.vercel.app) | [GitHub](https://github.com/Dev-Umisol)
 
 Project Link: [https://github.com/Dev-Umisol/Secret-Scanning-API](https://github.com/Dev-Umisol/Secret-Scanning-API)
 
